@@ -9,10 +9,10 @@ const dbURI = 'mongodb://localhost/travlr';
 //mongoose.set('useUnifiedTopology', true);
 //mongoose.createConnection(dbURI);
 const connect = () => {
-  setTimeout(() => mongoose.connect(dbURI, {
-    useNewUrlParser: true,
-    useCreateIndex: true
-  }), 1000);
+  setTimeout(() => mongoose.connect(dbURI), 
+    //useNewUrlParser: true
+    //useCreateIndex: true
+   1000);
 }
 
 

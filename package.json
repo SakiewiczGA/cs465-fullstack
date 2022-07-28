@@ -19,7 +19,7 @@
     "seedgoose": "^2.0.2"
   },
   "seedgoose": {
-    "modelBaseDirectory": "app_server/models",
+    "modelBaseDirectory": "app_api/models",
     "models": [
       "*.js"
     ],
