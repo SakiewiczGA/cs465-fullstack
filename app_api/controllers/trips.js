@@ -1,9 +1,11 @@
 const mongoose = require('mongoose');
-const model = mongoose.model('trips');
+const Trip = mongoose.model('trips');
+const users = require('../models/user'); //trying for missingschemaerror
+const User = mongoose.model('users');
 
 //GET: /trips - lists all trips
 const tripsList = async (req, res) => {
-    model
+    Trip
         .find({}) //empty filter for all
         .exec((err, trips) => {
             if (!trips) {
@@ -24,7 +26,7 @@ const tripsList = async (req, res) => {
 
 // GET: /trips/:tripCode - returns a single trip
 const tripsFindByCode = async (req, res) => {
-    model
+    Trip
         .find({ 'code': req.params.tripCode })
         .exec((err, trip) => {
             if (!trip) {
@@ -44,7 +46,11 @@ const tripsFindByCode = async (req, res) => {
 };
 
 const tripsAddTrip = async (req, res) => {
-    model
+    console.log('tripsAddTrip invoked with:\n', req.body);
+    getUser(req, res,
+        (req, res) => {
+    
+    Trip
         .create({
             code: req.body.code,
             name: req.body.name,
@@ -65,13 +71,17 @@ const tripsAddTrip = async (req, res) => {
                 .status(201) //created
                 .json(trip);
         }
-    }
-    );
+                }
+            );
+        }
+    )
 }
 
 const tripsUpdateTrip = async (req, res) => {
     console.log(req.body);
-    model
+    getUser(req, res,
+        (req, res) => {
+    Trip
         .findOneAndUpdate({ 'code': req.params.tripCode }, {
             code: req.body.code,
             name: req.body.name,
@@ -103,7 +113,36 @@ const tripsUpdateTrip = async (req, res) => {
                 .status(500) //server error
                 .json(err);
         });
+    }
+    )
 }
+
+const getUser = (req, res, callback) => {
+    //if (req.payload && req.payload.email) {
+    if (req.auth && req.auth.email) {
+        User
+            .findOne({ email: req.auth.email })
+            .exec((err, user) => {
+                if (!user) {
+                    return res
+                        .status(404)
+                        .json({ "message": "User not found" });
+                } else if (err) {
+                    console.log(err);
+                    return res 
+                        .status(404)
+                        .json(err);
+                }
+            callback(req, res, user.name);
+            });
+    } else {
+        return res
+            .status(404)
+            .json({ "message": "User not found" });
+    }
+};
+                 
+  
 
 module.exports = {
     tripsList,
